@@ -1,22 +1,11 @@
-console.log(`I am working`);
 //----------GLOBAL VARIABLES------//
 const BASE_URL = '/api/v1/cities'
 
 // DOM Elements
 const $newCityForm = $('#newCityForm');
 
-function getAllCities() {
-    $.ajax({
-        method: 'GET',
-        url: BASE_URL,
-        success: allCitiesSucess,
-        error: allCitiesError,
-    });
-};
-
-getAllCities()
-
-function allCitiesSucess(res) {
+//functions
+const allCitiesSucess = res => {
     const { data } = res;
     $(`#cities`).empty()
     data.forEach(city => {
@@ -25,23 +14,13 @@ function allCitiesSucess(res) {
     })
 }
 
-function allCitiesError(err) {
+const allCitiesError = err => {
     console.log(err)
 }
 
-function addNewCity(event) {
-    event.preventDefault();
-    $.ajax({
-        method: 'POST',
-        url: BASE_URL,
-        data: $newCityForm.serialize(),
-        success: newCitySuccess,
-        error: newCityError,
 
-    })
-}
 
-function cityTemplate(city) {
+const cityTemplate = city => {
     return `
     <div id="${city._id}">
     <h4 class="city-name">${city.name}</h4>
@@ -52,29 +31,22 @@ function cityTemplate(city) {
     `
 }
 
-function newCitySuccess(res) {
+const newCitySuccess = res => {
     getAllCities()
 }
 
-function newCityError(error) {
+const newCityError = error => {
     console.log(error)
 }
 
-function deleteCity(event) {
-    const cityId = $(this).parent().attr('id');
-    $.ajax({
-        method: 'DELETE',
-        url: `${BASE_URL}/${cityId}`,
-        success: res => getAllCities(),
-        error: error => console.log(error),
-    })
-}
 
-function editCity(event) {
-    const $cityName = $(this).siblings('h4').text();
-    const $cityDescription = $(this).siblings('p').text();
 
-    $(this).parent().empty().html(`
+const editCity = event => {
+    const $cityName = event.target.parentNode.childNodes[1].innerText;
+    const $cityDescription = event.target.parentNode.childNodes[3].innerText;
+    console.log(`Look at this`, $cityName, $cityDescription)
+
+    $(event.target).parent().empty().html(`
     <h4>Edit ${$cityName}</h4>
     <form>
         <div>
@@ -91,7 +63,30 @@ function editCity(event) {
     `);
 }
 
-function updateCity(event) {
+
+//==== AJAX Calls =====
+const getAllCities = () => {
+    $.ajax({
+        method: 'GET',
+        url: BASE_URL,
+        success: allCitiesSucess,
+        error: allCitiesError,
+    });
+};
+
+const addNewCity = event => {
+    event.preventDefault();
+    $.ajax({
+        method: 'POST',
+        url: BASE_URL,
+        data: $newCityForm.serialize(),
+        success: newCitySuccess,
+        error: newCityError,
+
+    })
+}
+
+const updateCity = event => {
     event.preventDefault();
     const id = event.target.parentNode.parentNode.id;
     const $cityName = $(`#editCityName`).val();
@@ -114,6 +109,20 @@ function updateCity(event) {
 
     })
 }
+
+const deleteCity = event => {
+    const cityId = $(event.target).parent().attr('id');
+    $.ajax({
+        method: 'DELETE',
+        url: `${BASE_URL}/${cityId}`,
+        success: res => getAllCities(),
+        error: error => console.log(error),
+    })
+}
+
+
+
+getAllCities()
 
 // Event listeners
 $newCityForm.on('submit', addNewCity);
