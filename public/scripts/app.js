@@ -19,7 +19,6 @@ const cities = document.getElementById(`cities`);
 //functions
 const allCitiesSucess = res => {
     const { data } = res;
-    console.log(data)
     cities.innerHTML = '';
     data.forEach(city => {
         const template = cityTemplate(city);
@@ -39,10 +38,7 @@ const newCityError = error => {
     console.log(error)
 }
 
-const handleEditClick = event => {
-    if (event.target.classList.contains('edit-button'));
-    editCity(event);
-}
+
 
 const editCity = event => {
     const cityName = event.target.parentNode.childNodes[1].innerText;
@@ -85,9 +81,10 @@ const addNewCity = event => {
         name: inputName,
         description: inputDescription
     }
-    console.log(JSON.stringify(newData));
+
     $.ajax({
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         url: BASE_URL,
         data: JSON.stringify(newData),
         success: newCitySuccess,
@@ -97,14 +94,12 @@ const addNewCity = event => {
 }
 
 const updateCity = event => {
-    event.preventDefault();
-    console.log(event)
     const id = event.target.parentNode.parentNode.id;
-    const cityName = event.target.parentNode.children;
-    const cityDescription = $('#editCityDescription').val();
+    const cityName = document.getElementById('editCityName').value;
+    const cityDescription = document.getElementById('editCityDescription').value;
     const newCity = {
-        name: $cityName,
-        description: $cityDescription
+        name: cityName,
+        description: cityDescription
     }
     $.ajax({
         method: 'PUT',
@@ -113,7 +108,8 @@ const updateCity = event => {
             'Content-Type': 'application/json'
         },
         data: JSON.stringify(newCity),
-        success: () => {
+        success: res => {
+            console.log(res)
             getAllCities();
         },
         error: error => console.log(error)
@@ -135,9 +131,20 @@ const deleteCity = event => {
 
 getAllCities()
 
+const handleCitySectionClick = event => {
+    event.preventDefault();
+    if (event.target.classList.contains('edit-button')) {
+        editCity(event);
+    } else if (event.target.classList.contains('submit-edit')) {
+        updateCity(event)
+    } else if (event.target.classList.contains('delete-button')) {
+        deleteCity(event)
+    } else if (event.target.classList.contains('cancel-edit')) {
+        getAllCities()
+    }
+
+}
+
 // Event listeners
 newCityForm.addEventListener('submit', addNewCity);
-$('#cities').on('click', '.delete-button', deleteCity);
-cities.addEventListener('click', handleEditClick);
-$('#cities').on('click', '.cancel-edit', getAllCities);
-$('#cities').on('click', '.submit-edit', updateCity);
+cities.addEventListener('click', handleCitySectionClick);
