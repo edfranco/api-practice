@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="styles/style.css">
+    <title>Express Cities</title>
+</head>
+
+<body>
+
+    <main>
+        <h1>Express Cities</h1>
+
+        <section>
+            <!-- <form action="/api/v1/cities" method="POST"> -->
+            <form id="newCityForm">
+                <input type="text" id="name" name="name" placeholder="name" />
+                <input type="text" id="description" name="description" placeholder="Description" />
+                <button type="submit">Add City</button>
+            </form>
+        </section>
+
+        <section id="cities"></section>
+    </main>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>
