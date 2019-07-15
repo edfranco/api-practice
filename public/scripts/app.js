@@ -2,13 +2,23 @@
 const BASE_URL = '/api/v1/cities'
 const cityTemplate = city => {
     return `
-    <div id="${city._id}">
-    <h4 class="city-name">${city.name}</h4>
-    <p class="description">${city.description}</p>
-    <button class="delete-button" >&times;</button>
-    <button class="edit-button">Edit</button>
+    <div class="cities" id="${city._id}">
+        <div class="content-container">
+            <h4 id="cityName" class="city-name">${city.name}</h4>
+            <img id="cityDescription" src="" alt="City image goes here"/>
+            <p class="description">${city.description}</p>
+        </div>
+        <div class="buttons-container">
+            <button class="delete-button" >&times;</button>
+            <button class="edit-button">Edit</button>
+    </div>
     </div>
     `
+}
+
+// ====State ====
+const state = {
+    cities: []
 }
 
 // DOM Elements
@@ -17,13 +27,18 @@ const cities = document.getElementById(`cities`);
 
 
 //functions
-const allCitiesSucess = res => {
-    const { data } = res;
+const render = data => {
     cities.innerHTML = '';
     data.forEach(city => {
         const template = cityTemplate(city);
         cities.insertAdjacentHTML('afterbegin', template)
     })
+
+}
+
+const allCitiesSucess = res => {
+    const { data } = res;
+    state.cities = data;
 }
 
 const allCitiesError = err => {
@@ -41,8 +56,9 @@ const newCityError = error => {
 
 
 const editCity = event => {
-    const cityName = event.target.parentNode.childNodes[1].innerText;
-    const cityDescription = event.target.parentNode.childNodes[3].innerText;
+    const cityName = document.getElementById('cityName').innerHTML;
+    console.log(cityName)
+    const cityDescription = document.getElementById('cityDescription').innerHTML;
 
 
     event.target.parentNode.innerHTML = `
@@ -63,34 +79,41 @@ const editCity = event => {
 }
 
 
-//==== AJAX Calls =====
+//==== Fetch Calls =====
 const getAllCities = () => {
-    $.ajax({
-        method: 'GET',
-        url: BASE_URL,
-        success: allCitiesSucess,
-        error: allCitiesError,
-    });
+    fetch(BASE_URL)
+        .then(res => res.json())
+        .then(json => {
+            state.cities = json.data;
+            render(state.cities)
+        })
+        .catch(error => console.log(error))
 };
+getAllCities()
 
 const addNewCity = event => {
     event.preventDefault();
-    const inputName = event.target[0].value;
-    const inputDescription = event.target[1].value;
+    const inputName = event.target[0];
+    const inputDescription = event.target[1];
     const newData = {
-        name: inputName,
-        description: inputDescription
+        name: inputName.value,
+        description: inputDescription.value
     }
 
-    $.ajax({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        url: BASE_URL,
-        data: JSON.stringify(newData),
-        success: newCitySuccess,
-        error: newCityError,
-
-    })
+    fetch(BASE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newData)
+        })
+        .then(res => {
+            inputName.value = '';
+            inputDescription.value = '';
+            inputName.focus();
+            newCitySuccess(res)
+        })
+        .catch(err => console.log(err))
 }
 
 const updateCity = event => {
@@ -101,35 +124,30 @@ const updateCity = event => {
         name: cityName,
         description: cityDescription
     }
-    $.ajax({
-        method: 'PUT',
-        url: `${BASE_URL}/${id}`,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: JSON.stringify(newCity),
-        success: res => {
-            console.log(res)
-            getAllCities();
-        },
-        error: error => console.log(error)
 
-    })
+    fetch(`${BASE_URL}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCity)
+        })
+        .then(res => {
+            console.log(res);
+            getAllCities()
+        })
+        .catch(err => console.log(err))
 }
 
 const deleteCity = event => {
-    const cityId = event.target.parentNode.id;
-    $.ajax({
-        method: 'DELETE',
-        url: `${BASE_URL}/${cityId}`,
-        success: res => getAllCities(),
-        error: error => console.log(error),
-    })
+    const cityId = event.target.parentNode.parentNode.id;
+    console.log(event)
+    fetch(`${BASE_URL}/${cityId}`, {
+            method: 'DELETE'
+        })
+        .then(() => getAllCities())
+        .catch(err => console.log(err))
 }
-
-
-
-getAllCities()
 
 const handleCitySectionClick = event => {
     event.preventDefault();

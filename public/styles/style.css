@@ -1,3 +1,48 @@
 body {
     background-color: pink;
+    margin: 0;
+}
+
+#cities {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10% 0;
+}
+
+.cities {
+    height: 50vh;
+    width: 50vw;
+    background-color: white;
+}
+
+.cities h4 {
+    color: red;
+    font-size: 2em;
+    margin: 0;
+    text-decoration: underline;
+    text-decoration-color: black;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10% 0;
+}
+
+.cities:hover {
+    cursor: pointer;
+    background-color: aliceblue;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.buttons-container *:hover {
+    cursor: pointer;
 }
